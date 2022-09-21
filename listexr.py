@@ -7,7 +7,6 @@ def match_ends(words):
 
     return(count)
 
-
 def front_x(words):
     lst = []
     lst1 = []
@@ -26,15 +25,12 @@ def front_x(words):
 def sort_last(tuples):
     lst = len(tuples) 
     for i in range(0, lst): 
-           
         for j in range(0, lst-i-1): 
             if (tuples[j][-1] > tuples[j + 1][-1]): 
                 temp = tuples[j] 
                 tuples[j]= tuples[j + 1] 
                 tuples[j + 1]= temp 
     return tuples 
-
-
 
 def test(got, expected):
   if got == expected:
