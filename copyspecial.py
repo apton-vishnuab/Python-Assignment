@@ -18,6 +18,11 @@ def get_special_paths(dir):
     for i in range(0, len(str_match)):
           print(os.path.abspath(str_match[i]))
 
+def copy_to(paths,to_dir):
+  for path in paths:
+    f = os.path.basename(path)
+    shutil.copy(path, os.path.join(to_dir, f))
+
 def main():
   args = sys.argv[1:]
   if not args:
@@ -39,6 +44,9 @@ def main():
     sys.exit(1)
 
   get_special_paths(args)
+  if todir:
+    copy_to(paths, dir)
+
  
 if __name__ == "__main__":
   main()
