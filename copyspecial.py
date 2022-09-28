@@ -1,10 +1,10 @@
+from fileinput import filename
 import sys
 import re
 import os
 import shutil
-from zipfile import ZipFile
 from os.path import basename
-
+import zipfile
  
 def get_special_paths(dir):
   result = []
@@ -13,7 +13,7 @@ def get_special_paths(dir):
     match = re.search(r'__(\w+)__', i)
     if match:
       result.append(os.path.abspath(os.path.join(dir, i)))
-  return result
+  return(result)
  
  
 def copy_to(paths, to_dir):
@@ -22,14 +22,12 @@ def copy_to(paths, to_dir):
     shutil.copy(i, os.path.join(to_dir, f))
  
  
-def zip_to(dirName):
-  with ZipFile('Generated_zipfile.zip', 'w') as zipObj:
-   for folderName, subfolders, filenames in os.walk(dirName):
-       for filename in filenames:
-           filePath = os.path.join(folderName, filename)
-           zipObj.write(filePath, basename(filePath))
+def zip_to(paths, dir):
+  with zipfile.ZipFile(dir,'w',compression=zipfile.ZIP_DEFLATED) as z:
+    for i in paths:
+      base=os.path.basename(i)
+      z.write(base)
 
-  print("Zip File Generated")
 
 def main():
   args = sys.argv[1:]
@@ -58,7 +56,7 @@ def main():
   if todir:
     copy_to(paths, todir)
   elif tozip:
-    zip_to(tozip)
+    zip_to(paths,tozip)
   else:
     print ('\n'.join(paths))
 

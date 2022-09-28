@@ -6,6 +6,7 @@ def mimic_dict(filename):
   """Returns mimic dict mapping each word to list of words which follow it."""
   dict = {}
   f = open(filename, 'r')
+  global text
   text = (f.read()).split()
   f.close()
   for i in range(len(text)-1):
@@ -14,12 +15,10 @@ def mimic_dict(filename):
     else:
       dict[text[i]] = [text[i+1]]
 
-  #print(dict)
+  print(dict)
   return dict
 
-def print_mimic(mimic_dict, word):
-  """Given mimic dict and start word, prints 200 random words."""
-
+"""def print_mimic(mimic_dict, word):
   for i in range(200):
     keys = list(mimic_dict.keys())
     random_key = random.choice(keys)
@@ -47,8 +46,20 @@ def print_mimic(mimic_dict, word):
             if (proposed_word is None):
                 current_word = random_key
             else:
-                current_word = proposed_word
+                current_word = proposed_word"""
 
+def print_mimic(mimic_dict, word):
+  for i in range(1,201):
+    print(i,word)
+    length=len(text)
+    length=length-1
+    if word == text[length]:
+        word=''
+    else:
+         random_list=(mimic_dict[word])
+         word=random.choice(random_list)
+  return word
+    
 
 # Provided main(), calls mimic_dict() and mimic()
 def main():

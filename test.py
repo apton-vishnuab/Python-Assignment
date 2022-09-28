@@ -15,6 +15,6 @@ def wget2(url):
   except IOError:
     print('problem reading url:', url)
 
-url = "https://developers.google.com/edu/python/utilities"
+url = "https://www.imanandhuor.ml"
 
 wget2(url)
