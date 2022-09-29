@@ -1,71 +1,73 @@
 import os
 import re
-import sys
 import urllib.request, urllib.parse, urllib.error
-
-def url_sort_key(url):
-  match = re.search(r'-(\w+)-(\w+)\.\w+', url)
-  if match:
-    return match.group(2)
-  else:
-    return url
+import time
+import sys
+import webbrowser
 
 def read_urls(filename):
-  underbar = filename.index('_')
-  host = filename[underbar + 1:]
-
-  url_dict = {}
-
-  f = open(filename)
-  for line in f:
-    match = re.search(r'"GET (\S+)', line)
-
-    if match:
-      path = match.group(1)
-      if 'puzzle' in path:
-        url_dict['http://' + host + path] = 1
-
-  return sorted(list(url_dict.keys()), key=url_sort_key)
-
+    ub = filename.index('_') # Getting the index of '_' in the filename that given as args.
+    host = filename[ub + 1:] # Getting the host name followed after the '_' .
+    url_dict = {}
+    with open(filename) as f:
+        for i in f:
+            match = re.search(r'"GET (\S+)', i) # Regex operation on Log file for finding the rest of URL.
+            if match:
+                path = match.group(1) # The first parenthesized subgroup.
+                if 'puzzle' in path:
+                    url_dict['http://' + host + path] = 1
+    
+    def sort(url):
+        match = re.search(r'-(\w+)-(\w+)\.\w+', url)
+        if match:
+            return match.group(2)
+        else:
+            return url
+    
+    return sorted(list(url_dict.keys()), key=sort)
 
 def download_images(img_urls, dest_dir):
-  if not os.path.exists(dest_dir):
-    os.makedirs(dest_dir)
-
-  index = open(os.path.join(dest_dir, 'index.html'), 'w')
-  index.write('<html><body>\n')
-
-  i = 0
-  for img_url in img_urls:
-    local_name = 'img%d' % i
-    print(img_url)
-    urllib.request.urlretrieve(img_url, os.path.join(dest_dir, local_name))
-
-    index.write('<img src="%s">' % (local_name,))
-    i += 1
-
-  index.write('\n</body></html>\n')
-  index.close()
+    if not os.path.exists(dest_dir):
+      os.makedirs(dest_dir)
+    animation = ["[■□□□□□□□□□]","[■■□□□□□□□□]", "[■■■□□□□□□□]", "[■■■■□□□□□□]", "[■■■■■□□□□□]", "[■■■■■■□□□□]", "[■■■■■■■□□□]", "[■■■■■■■■□□]", "[■■■■■■■■■□]", "[■■■■■■■■■■]"]
+    file = open(os.path.join(dest_dir, 'index.html'), 'w')
+    file.write('<html><body>\n')
+    i = 0
+    print("Retrieving Url's, Please wait...")
+    
+    for url in img_urls:
+        local_name = 'img_%d' % i
+        time.sleep(0.2)
+        sys.stdout.write("\r" + animation[i % len(animation)])
+        sys.stdout.flush()
+        urllib.request.urlretrieve(url, os.path.join(dest_dir, local_name))
+        file.write('<img src="%s">' % (local_name,))
+        i += 1
+    
+    print("\n")
+    file.write('\n</body></html>\n')
+    print("Opening image in browser..")
+    f_path = os.path.abspath(dest_dir+"/index.html") 
+    op = webbrowser.open('file://' + os.path.realpath(f_path)) # Opening 'index.html' file in browser
+    file.close()
+    return op
 
 
 def main():
-  args = sys.argv[1:]
-
-  if not args:
-    print('usage: [--todir dir] logfile ')
-    sys.exit(1)
-
-  todir = ''
-  if args[0] == '--todir':
-    todir = args[1]
-    del args[0:2]
-
-  img_urls = read_urls(args[0])
-
-  if todir:
-    download_images(img_urls, todir)
-  else:
-    print('\n'.join(img_urls))
+    args = sys.argv[1:]
+    if not args:
+        print('usage: [--todir dir] logfile ')
+        sys.exit(1)
+    todir = ''
+    if args[0] == '--todir':
+        todir = args[1]
+        del args[0:2]
+        
+    img_urls = read_urls(args[0])
+    if todir:
+        download_images(img_urls, todir)
+    else:
+        print('\n'.join(img_urls))
 
 if __name__ == '__main__':
-  main()
+    main()
